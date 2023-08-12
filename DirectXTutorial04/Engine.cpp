@@ -74,7 +74,7 @@ bool Engine::InitializeScene()
 {
     // VS 컴파일
     HRESULT result = D3DCompileFromFile(
-        L"..//shaders//BasicVS.hlsl",
+        L"BasicVS.hlsl",
         NULL,
         NULL,
         "main", // wchar(와일드 캐릭터) 아니라서 L 안 붙여도 됨.
@@ -98,7 +98,7 @@ bool Engine::InitializeScene()
     // VS랑 하는 방식은 똑같음. 파일명이랑 변수명만 조금씩 바꿔주자.
     // PS 컴파일.
     result = D3DCompileFromFile(
-        L"..//shaders//BasicPS.hlsl",
+        L"BasicPS.hlsl",
         NULL,
         NULL,
         "main",

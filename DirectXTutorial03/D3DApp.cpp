@@ -29,6 +29,7 @@ bool D3DApp::Initialize()
 
 bool D3DApp::InitializeDirect3D()
 {
+    
     // 장치 생성.
     // Device - 생성.
     // DeviceContext - 값, 장치 설정.

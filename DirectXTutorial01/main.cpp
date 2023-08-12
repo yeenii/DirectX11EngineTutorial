@@ -88,6 +88,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine,
 		{
 			// 快府狼 老.
 			// 弊府扁 (DirectX 11).
+			//青己 弊府扁 
 		}
 	}
 }
