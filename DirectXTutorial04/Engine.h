@@ -1,5 +1,6 @@
 #pragma once
 #include "D3DApp.h"
+#include "Vertex.h"
 class Engine : public D3DApp
 {
 public:
@@ -15,7 +16,8 @@ protected:
 	
 private:
 	// 장면 초기화.
-	bool InitializeScene();
+	bool InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer);
+	void RenderBuffers(ID3D11DeviceContext* deviceContext);
 
 	// 변수.
 	// 쉐이더도 코드이다. (프로그램.)
@@ -33,5 +35,6 @@ private:
 
 	// 점 개수.
 	int vertexCount = 0; // 전달할 때 알려줘야 하기 때문에 갖고 있자.
+
 };
 

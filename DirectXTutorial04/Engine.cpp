@@ -21,7 +21,7 @@ bool Engine::Initialize()
     }
 
     // 장면 초기화.
-    if (InitializeScene() == false)
+    if (InitializeScene(device,vertexShaderBuffer) == false)
     {
         return false;
     }
@@ -59,18 +59,28 @@ void Engine::Update()
 
 void Engine::DrawScene()
 {
-    // 색상 고르기.
+    // 배경 색상 고르기.
     float backgroundColor[4] = { 0.1f, 0.5f, 0.1f, 1.0f };
     
     // 지우기 (Clear) - 실제로는 덮어씌워서 색칠하기.
     // Begin Draw(Render) - DX9.
     deviceContext->ClearRenderTargetView(renderTargetView, backgroundColor);
 
+    // 그리기 준비.
+    //vertexShader.Bind(deviceContext);//VertexSetShader
+    //pixelShader.Bind(deviceContext); //PixelSetShader
+    deviceContext->VSSetShader(vertexShader, NULL, NULL);
+    deviceContext->PSSetShader(pixelShader, NULL, NULL);
+
+    // 그리기.
+    RenderBuffers(deviceContext);
+
+
     // 프레임 바꾸기. FrontBuffer <-> BackBuffer.
     swapChain->Present(1, 0);
 }
 
-bool Engine::InitializeScene()
+bool Engine::InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer)
 {
     // VS 컴파일
     HRESULT result = D3DCompileFromFile(
@@ -119,7 +129,45 @@ bool Engine::InitializeScene()
     );
     if (FAILED(result)) { MessageBox(nullptr, L"픽셀 쉐이더 생성 실패", L"오류", 0); }
 
+
     // 정점 데이터 만들기.
+    // 정점(Vertex) 배열.
+    // 왼손 좌표계.
+    Vertex vertices[] =
+    {
+        Vertex(0.0f, 0.5f, 0.5f),
+        Vertex(0.5f, -0.5f, 0.5f),
+        Vertex(-0.5f, -0.5f, 0.5f)
+    };
+
+    // 정점의 개수.
+    vertexCount = ARRAYSIZE(vertices);
+
+    // 정점 버퍼 만들기.
+    D3D11_BUFFER_DESC vertexBufferDesc;
+    ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
+    vertexBufferDesc.ByteWidth = sizeof(vertices); // 얼마만큼 읽을까.
+    vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER; // 정점 데이터 버퍼로 쓸 것이다.
+    vertexBufferDesc.CPUAccessFlags = 0; // 성능을 올리기 위해 CPU가 GPU 접근할 수 있게 할까? 우리가 구분 잘해서 코딩할 수 있으면 접근하게 만들어도 됨. 0은 못 접근하게.
+    vertexBufferDesc.MiscFlags = 0;
+    vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+
+    // 데이터 담기.
+    D3D11_SUBRESOURCE_DATA vertexBufferData;
+    ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
+    vertexBufferData.pSysMem = vertices;
+
+    // 정점 버퍼 생성.
+    result = device->CreateBuffer(
+        &vertexBufferDesc,
+        &vertexBufferData,
+        &vertexBuffer
+    );
+    if (FAILED(result))
+    {
+        MessageBox(nullptr, L"정점 버퍼 생성 실패", L"오류", 0);
+        return false;
+    }
 
     // 정점 데이터 설정하기.
 
@@ -149,4 +197,19 @@ bool Engine::InitializeScene()
     // 명세 설정하기.
 
     return true;
+}
+
+void Engine::RenderBuffers(ID3D11DeviceContext* deviceContext)
+{
+    // 그리기. (Render = Bind + Draw)
+    // Bind
+    unsigned int stride = sizeof(Vertex); // 한번에 몇 개씩 읽을 지. XYZ니까 *3.
+    unsigned int offset = 0;
+
+    deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+    deviceContext->IASetInputLayout(inputLayout);
+    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // 선을 그릴 때는 LineList.
+
+    // Draw
+    deviceContext->Draw(vertexCount, 0); // 이게 DrawCall이다.
 }
