@@ -21,7 +21,7 @@ bool Engine::Initialize()
     }
 
     // 장면 초기화.
-    if (InitializeScene(device,vertexShaderBuffer) == false)
+    if (InitializeScene(device, vertexShaderBuffer) == false)
     {
         return false;
     }
@@ -61,7 +61,7 @@ void Engine::DrawScene()
 {
     // 배경 색상 고르기.
     float backgroundColor[4] = { 0.1f, 0.5f, 0.1f, 1.0f };
-    
+
     // 지우기 (Clear) - 실제로는 덮어씌워서 색칠하기.
     // Begin Draw(Render) - DX9.
     deviceContext->ClearRenderTargetView(renderTargetView, backgroundColor);
@@ -79,6 +79,7 @@ void Engine::DrawScene()
     // 프레임 바꾸기. FrontBuffer <-> BackBuffer.
     swapChain->Present(1, 0);
 }
+
 
 bool Engine::InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer)
 {
@@ -104,6 +105,8 @@ bool Engine::InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer)
         &vertexShader
     );
     if (FAILED(result)) { MessageBox(nullptr, L"정점 쉐이더 생성 실패", L"오류", 0); }
+
+
 
     // VS랑 하는 방식은 똑같음. 파일명이랑 변수명만 조금씩 바꿔주자.
     // PS 컴파일.
@@ -213,3 +216,4 @@ void Engine::RenderBuffers(ID3D11DeviceContext* deviceContext)
     // Draw
     deviceContext->Draw(vertexCount, 0); // 이게 DrawCall이다.
 }
+

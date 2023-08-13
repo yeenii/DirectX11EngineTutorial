@@ -10,13 +10,14 @@ public:
 	bool Initialize() override; // 타이머, 씬 등에 대한 초기화
 	int Run() override;
 
+
 protected:
 	void Update() override;
 	void DrawScene() override;
 	
 private:
 	// 장면 초기화.
-	bool InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer);
+	bool InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer); //shader compile, create, bind 있음 
 	void RenderBuffers(ID3D11DeviceContext* deviceContext);
 
 	// 변수.
