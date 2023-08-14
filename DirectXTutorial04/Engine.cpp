@@ -57,7 +57,7 @@ int Engine::Run()
 
 void Engine::Update()
 {
-    transformMatrix = Matrix4f::Scale(scale) * Matrix4f::Rotation(rotation) * Matrix4f::Translation(position);
+    //transformMatrix = Matrix4f::Scale(scale) * Matrix4f::Rotation(rotation) * Matrix4f::Translation(position);
 }
 
 void Engine::DrawScene()
@@ -294,12 +294,13 @@ void Engine::RenderBuffers(ID3D11DeviceContext* deviceContext)
     unsigned int stride = sizeof(Vertex); // 한번에 몇 개씩 읽을 지. XYZ니까 *3.
     unsigned int offset = 0;
 
+    //Triangle 그리기
     deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
     deviceContext->IASetInputLayout(inputLayout);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     //Transform Buffer(좌표 설정)
-    transformMatrix = Matrix4f::Scale(Vector3f(0.5f, 0.5f, 0.5f)) * Matrix4f::Rotation(Vector3f()) * Matrix4f::Translation(Vector3f(0.5f, 0.5f,0.5f));
+    transformMatrix = Matrix4f::Scale(Vector3f(0.5f, 0.5f, 0.5f)) * Matrix4f::Rotation(Vector3f()) * Matrix4f::Translation(Vector3f(0.5f, 0.0f,0.5f));
     
     // 행렬 데이터가 담긴 버퍼 바인딩. (설정.)
     deviceContext->VSSetConstantBuffers(0, 1, &constantBuffer);
@@ -310,10 +311,13 @@ void Engine::RenderBuffers(ID3D11DeviceContext* deviceContext)
     deviceContext->Draw(vertexCount, 0); // 이게 DrawCall이다.
 
     
+    //Quad 그리기 
     // 두 번째 정점 버퍼 설정과 입력 레이아웃 바인딩
     deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer2, &stride, &offset);
     deviceContext->IASetInputLayout(inputLayout2);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    transformMatrix = Matrix4f::Scale(Vector3f(0.5f, 0.5f, 0.5f)) * Matrix4f::Rotation(Vector3f()) * Matrix4f::Translation(Vector3f(-0.25f, 0.0f, -0.25f));
 
     // 상수 버퍼 설정 (두 번째 정점 버퍼에 대한 상수 버퍼)
     deviceContext->VSSetConstantBuffers(0, 1, &constantBuffer);
