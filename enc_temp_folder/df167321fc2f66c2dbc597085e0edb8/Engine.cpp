@@ -298,7 +298,7 @@ void Engine::RenderBuffers(ID3D11DeviceContext* deviceContext)
     deviceContext->IASetInputLayout(inputLayout);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    //Transform Buffer(좌표 설정)
+    //Transform Buffer
     transformMatrix = Matrix4f::Scale(Vector3f(0.5f, 0.5f, 0.5f)) * Matrix4f::Rotation(Vector3f()) * Matrix4f::Translation(Vector3f(0.5f, 0.5f,0.5f));
     
     // 행렬 데이터가 담긴 버퍼 바인딩. (설정.)

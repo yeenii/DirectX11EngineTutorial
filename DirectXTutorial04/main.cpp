@@ -17,6 +17,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)
 #endif
 {
+	Matrix4f transformMatrix;
 	// 객체.
 	Engine engine = Engine(hInstance, 1280, 800, L"그래픽스 엔진");
 
@@ -33,5 +34,5 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine,
 	//Vector3f
 	Vector3f vector(1, 1, 1);
 	Vector3f vector2(2, 2, 2);
-	Vector3f vector3 = vector + vector2;
+	Vector3f vector3 = vector + vector2;//3 3 3을 출력함 
 }
