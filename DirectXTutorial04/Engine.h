@@ -4,6 +4,10 @@
 #include "Matrix4f.h"
 #include <wrl.h>
 #include <d3d11.h>
+#include <string>
+#include "Texture.h"
+#include "Shader.h"
+#include <vector>
 
 using Microsoft::WRL::ComPtr;
 
@@ -13,7 +17,6 @@ public:
 	//TransformBuffer
 	Matrix4f transformMatrix;
 	Engine(HINSTANCE hInstance, int width, int height, std::wstring title);
-
 	~Engine();
 
 	bool Initialize() override; // 타이머, 씬 등에 대한 초기화
@@ -33,11 +36,11 @@ public:
 	void SetScale(float x, float y, float z);
 	void SetScale(Vector3f scale);
 
-	
 
 protected:
 	void Update() override;
 	void DrawScene() override;
+	
 	
 private:
 	// 장면 초기화.
@@ -53,23 +56,35 @@ private:
 	ID3D11PixelShader* pixelShader;		// 컴파일 된 이진코드로 생성한 쉐이더.
 	ID3DBlob* vertexShaderBuffer;		// .hlsl 쉐이더 코드 파일로 컴파일 된 이진코드.
 	ID3DBlob* pixelShaderBuffer;		// .hlsl 쉐이더 코드 파일로 컴파일 된 이진코드.
+	
+	//Texture textures; //pixel shader textures 
+	std::wstring filename;
+	ID3D11SamplerState* samplerState; //픽셀 셰이더 샘플러 스테이트 
+	std::vector<Texture> textures;
 
 	// IA - Input Assembler. (렌더링 파이프라인 중에 젤 첫 단계.)	
 	int vertexCount = 0;// 점 개수. // 전달할 때 알려줘야 하기 때문에 갖고 있자.
 	int vertexCount2 = 0;// 점 개수. // 전달할 때 알려줘야 하기 때문에 갖고 있자.
+	int vertexCount3 = 0;// 점 개수. // 전달할 때 알려줘야 하기 때문에 갖고 있자.
 	ID3D11Buffer* vertexBuffer; // 정점 버퍼. (Vertex 전달 용도.)
 	ID3D11Buffer* vertexBuffer2; // 정점 버퍼. (Vertex 전달 용도.)
+	ID3D11Buffer* vertexBuffer3; // 정점 버퍼. (Vertex 전달 용도.)
 	ID3D11InputLayout* inputLayout; // 입력 레이아웃. Vertex에 어떤 정보들(x,y,z,u,v,nx,ny,nz 등)이 담길 지.
 	ID3D11InputLayout* inputLayout2; // 입력 레이아웃. Vertex에 어떤 정보들(x,y,z,u,v,nx,ny,nz 등)이 담길 지.
+	ID3D11InputLayout* inputLayout3; // 입력 레이아웃. Vertex에 어떤 정보들(x,y,z,u,v,nx,ny,nz 등)이 담길 지.
 	
 
 	//Transform Buffer
 	ID3D11Buffer* constantBuffer; //상수버퍼
 
+	
+
 	// 트랜스폼 데이터.
 	Vector3f position;
 	Vector3f rotation;
 	Vector3f scale;
+
+	
 
 
 };

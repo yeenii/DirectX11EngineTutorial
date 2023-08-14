@@ -9,6 +9,7 @@ D3DApp::D3DApp(HINSTANCE hInstance, int width, int height, std::wstring title)
     Window::SetTitle(title);
 }
 
+
 D3DApp::~D3DApp()
 {
 

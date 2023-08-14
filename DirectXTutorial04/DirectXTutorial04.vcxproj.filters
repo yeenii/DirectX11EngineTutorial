@@ -45,6 +45,18 @@
     <ClCompile Include="Vector2f.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="VertexUV.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceLoader.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -71,6 +83,18 @@
     <ClInclude Include="Vector2f.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="VertexUV.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceLoader.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\..\..\Desktop\STL_GraphicsEngine2-07d353e4028d394174835ce4a21a03816e804ad0\STL_GraphicsEngine2-07d353e4028d394174835ce4a21a03816e804ad0\shaders\BasicPS.hlsl">
@@ -79,5 +103,16 @@
     <FxCompile Include="..\..\..\..\Desktop\STL_GraphicsEngine2-07d353e4028d394174835ce4a21a03816e804ad0\STL_GraphicsEngine2-07d353e4028d394174835ce4a21a03816e804ad0\shaders\BasicVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="TextureMappingPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="TextureMappingVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\res\textures\dog.jpg">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
 </Project>
