@@ -7,7 +7,10 @@
 #include <string>
 #include "Texture.h"
 #include "Shader.h"
+#include "VertexUV.h"
 #include <vector>
+#include "ResourceLoader.h"
+#include "ConstantBuffer.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -15,7 +18,9 @@ class Engine : public D3DApp
 {
 public:
 	//TransformBuffer
-	Matrix4f transformMatrix;
+	//Matrix4f transformMatrix;
+	ConstantBuffer transformMatrix;
+	ConstantBuffer gTransform; //constantBuffer.h
 	Engine(HINSTANCE hInstance, int width, int height, std::wstring title);
 	~Engine();
 
@@ -36,6 +41,8 @@ public:
 	void SetScale(float x, float y, float z);
 	void SetScale(Vector3f scale);
 
+	//ResourceModel
+	//static void LoadModel(std::string filename, std::vector<VertexUV>* vertices4);
 
 protected:
 	void Update() override;
@@ -56,9 +63,15 @@ private:
 	ID3D11PixelShader* pixelShader;		// 컴파일 된 이진코드로 생성한 쉐이더.
 	ID3DBlob* vertexShaderBuffer;		// .hlsl 쉐이더 코드 파일로 컴파일 된 이진코드.
 	ID3DBlob* pixelShaderBuffer;		// .hlsl 쉐이더 코드 파일로 컴파일 된 이진코드.
+
+	ID3D11VertexShader* TVertexShader;	// 컴파일 된 이진코드로 생성한 쉐이더.
+	ID3D11PixelShader* TPixelShader;		// 컴파일 된 이진코드로 생성한 쉐이더.
+	ID3DBlob* TVertexShaderBuffer;		// .hlsl 쉐이더 코드 파일로 컴파일 된 이진코드.
+	ID3DBlob* TPixelShaderBuffer;		// .hlsl 쉐이더 코드 파일로 컴파일 된 이진코드.
 	
-	//Texture textures; //pixel shader textures 
-	std::wstring filename;
+	
+	std::string filename="sphere.fbx"; //LoadModel (4.ModelUV)
+
 	ID3D11SamplerState* samplerState; //픽셀 셰이더 샘플러 스테이트 
 	std::vector<Texture> textures;
 
@@ -66,17 +79,20 @@ private:
 	int vertexCount = 0;// 점 개수. // 전달할 때 알려줘야 하기 때문에 갖고 있자.
 	int vertexCount2 = 0;// 점 개수. // 전달할 때 알려줘야 하기 때문에 갖고 있자.
 	int vertexCount3 = 0;// 점 개수. // 전달할 때 알려줘야 하기 때문에 갖고 있자.
+	int vertexCount4 = 0;// 점 개수. // 전달할 때 알려줘야 하기 때문에 갖고 있자.
 	ID3D11Buffer* vertexBuffer; // 정점 버퍼. (Vertex 전달 용도.)
 	ID3D11Buffer* vertexBuffer2; // 정점 버퍼. (Vertex 전달 용도.)
 	ID3D11Buffer* vertexBuffer3; // 정점 버퍼. (Vertex 전달 용도.)
+	ID3D11Buffer* vertexBuffer4; // 정점 버퍼. (Vertex 전달 용도.)
 	ID3D11InputLayout* inputLayout; // 입력 레이아웃. Vertex에 어떤 정보들(x,y,z,u,v,nx,ny,nz 등)이 담길 지.
 	ID3D11InputLayout* inputLayout2; // 입력 레이아웃. Vertex에 어떤 정보들(x,y,z,u,v,nx,ny,nz 등)이 담길 지.
 	ID3D11InputLayout* inputLayout3; // 입력 레이아웃. Vertex에 어떤 정보들(x,y,z,u,v,nx,ny,nz 등)이 담길 지.
+	ID3D11InputLayout* inputLayout4; // 입력 레이아웃. Vertex에 어떤 정보들(x,y,z,u,v,nx,ny,nz 등)이 담길 지.
 	
 
 	//Transform Buffer
-	ID3D11Buffer* constantBuffer; //상수버퍼
-
+	//ID3D11Buffer* constantBuffer; //상수버퍼
+	ID3D11Buffer* cBuffer;
 	
 
 	// 트랜스폼 데이터.
@@ -84,7 +100,8 @@ private:
 	Vector3f rotation;
 	Vector3f scale;
 
-	
+	float width;
+	float height;
 
 
 };

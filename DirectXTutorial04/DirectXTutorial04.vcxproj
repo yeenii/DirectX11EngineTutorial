@@ -71,32 +71,32 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\GitHubLocal\DirectX11EngineTutorial\include\DirectXTex;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\GitHubLocal\DirectX11EngineTutorial\lib\DirectXTex\Win32\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\GitHubLocal\DirectX11EngineTutorial\include\DirectXTex;C:\GitHubLocal\DirectX11EngineTutorial\include\assimp;C:\GitHubLocal\DirectX11EngineTutorial\include\DirectXTK;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\GitHubLocal\DirectX11EngineTutorial\lib\DirectXTex\Win32\Debug;C:\GitHubLocal\DirectX11EngineTutorial\lib\assimp\x64;C:\GitHubLocal\DirectX11EngineTutorial\lib\DirectXTK\X64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\GitHubLocal\DirectX11EngineTutorial\include\DirectXTex;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\GitHubLocal\DirectX11EngineTutorial\lib\DirectXTex\Win32\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\GitHubLocal\DirectX11EngineTutorial\include\DirectXTex;C:\GitHubLocal\DirectX11EngineTutorial\include\assimp;C:\GitHubLocal\DirectX11EngineTutorial\include\DirectXTK;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\GitHubLocal\DirectX11EngineTutorial\lib\DirectXTex\Win32\Debug;C:\GitHubLocal\DirectX11EngineTutorial\lib\assimp\x64;C:\GitHubLocal\DirectX11EngineTutorial\lib\DirectXTK\X64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\GitHubLocal\DirectX11EngineTutorial\include\DirectXTex;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\GitHubLocal\DirectX11EngineTutorial\lib\DirectXTex\Win32\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\GitHubLocal\DirectX11EngineTutorial\include\DirectXTex;C:\GitHubLocal\DirectX11EngineTutorial\include\assimp;C:\GitHubLocal\DirectX11EngineTutorial\include\DirectXTK;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\GitHubLocal\DirectX11EngineTutorial\lib\DirectXTex\Win32\Debug;C:\GitHubLocal\DirectX11EngineTutorial\lib\assimp\x64;C:\GitHubLocal\DirectX11EngineTutorial\lib\DirectXTK\X64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\GitHubLocal\DirectX11EngineTutorial\include\DirectXTex;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\GitHubLocal\DirectX11EngineTutorial\lib\DirectXTex\Win32\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\GitHubLocal\DirectX11EngineTutorial\include\DirectXTex;C:\GitHubLocal\DirectX11EngineTutorial\include\assimp;C:\GitHubLocal\DirectX11EngineTutorial\include\DirectXTK;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\GitHubLocal\DirectX11EngineTutorial\lib\DirectXTex\Win32\Debug;C:\GitHubLocal\DirectX11EngineTutorial\lib\assimp\x64;C:\GitHubLocal\DirectX11EngineTutorial\lib\DirectXTK\X64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);WIN32;_DEBUG;_CONSOLE;dSINGLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTex.lib;assimp-vc143-mtd.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -105,7 +105,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);WIN32;_DEBUG;_CONSOLE;dSINGLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -113,20 +113,20 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTex.lib;assimp-vc143-mtd.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);WIN32;_DEBUG;_CONSOLE;dSINGLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTex.lib;assimp-vc143-mtd.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,7 +135,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);WIN32;_DEBUG;_CONSOLE;dSINGLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -143,7 +143,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTex.lib;assimp-vc143-mtd.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -162,6 +162,7 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="D3DApp.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="MathUtil.h" />

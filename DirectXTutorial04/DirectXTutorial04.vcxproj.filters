@@ -95,6 +95,9 @@
     <ClInclude Include="Shader.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="ConstantBuffer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\..\..\Desktop\STL_GraphicsEngine2-07d353e4028d394174835ce4a21a03816e804ad0\STL_GraphicsEngine2-07d353e4028d394174835ce4a21a03816e804ad0\shaders\BasicPS.hlsl">

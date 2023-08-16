@@ -4,11 +4,13 @@
 #include "VertexUV.h"
 #include "Texture.h"
 #include "Shader.h"
-
+#include "InputProcessor.h"
+#include "ResourceLoader.h"
+#include <string>
 //#include "TextureMappingShader.h"
 
 Engine::Engine(HINSTANCE hInstance, int width, int height, std::wstring title)
-    : D3DApp(hInstance, width, height, title)
+    : D3DApp(hInstance, width, height, title), width(width), height(height)
 {
     //memset(&transformMatrix, 0, sizeof(transformMatrix)); //transform Buffer
 }
@@ -34,6 +36,8 @@ bool Engine::Initialize()
     }
 
     return true;
+
+
 }
 
 // 1. 메시지 처리 루프.
@@ -52,6 +56,16 @@ int Engine::Run()
         }
         else
         {
+            //// ESC 종료.
+            //if (InputProcessor::IsKeyDown(Keyboard::Keys::Escape) == true)
+            //{
+            //    if (MessageBox(nullptr, L"종료하시겠습니까?", L"종료", MB_YESNO) == IDYES)
+            //    {
+            //        DestroyWindow(Window::WindowHandle());
+            //        return 0;
+            //    }
+            //}
+
             Update();
             DrawScene();
         }
@@ -62,7 +76,22 @@ int Engine::Run()
 
 void Engine::Update()
 {
+    //업데이트할 때 마다 변경할 것 넣어주기 
+    static float t = 0;
+    t += 0.2;
     //transformMatrix = Matrix4f::Scale(scale) * Matrix4f::Rotation(rotation) * Matrix4f::Translation(position);
+    transformMatrix.mWorld = DirectX::XMMatrixTranspose(DirectX::XMMatrixMultiply(DirectX::XMMatrixMultiply(DirectX::XMMatrixScaling(1.f, 1.f, 1.f), DirectX::XMMatrixRotationRollPitchYaw(0.f, 0.f, 0.f)), DirectX::XMMatrixTranslation(t, t, t)));
+    //// 테스트 용.
+    //static float xPos = quad.Position().x;
+    //if (InputProcessor::IsKeyDown(Keyboard::Keys::A))
+    //{
+    //    xPos -= 0.01f;
+    //}
+    //if (InputProcessor::IsKeyDown(Keyboard::Keys::D))
+    //{
+    //    xPos += 0.01f;
+    //}
+    //quad.SetPosition(xPos, quad.Position().y, 0.0f);
 }
 
 void Engine::DrawScene()
@@ -77,7 +106,24 @@ void Engine::DrawScene()
     // 그리기 준비.
     deviceContext->VSSetShader(vertexShader, NULL, NULL);
     deviceContext->PSSetShader(pixelShader, NULL, NULL);
+
+    deviceContext->VSSetShader(TVertexShader, NULL, NULL);
+    deviceContext->PSSetShader(TPixelShader, NULL, NULL);
     deviceContext->PSSetSamplers(0, 1, &samplerState); //픽셀 셰이더 샘플러 스테이트 
+
+    //그리기 준비 
+    //TextureMappingShader 
+    deviceContext->VSSetShader(vertexShader, NULL, NULL); //Vertexshader
+    deviceContext->PSSetShader(pixelShader, NULL, NULL); //pixelshader
+    for (int ix = 0; ix < textures.size(); ++ix)
+    {
+        deviceContext->PSSetShaderResources(
+            ix,
+            1,
+            textures[ix].textureResource.GetAddressOf()
+        );
+    } //BindTextures
+    deviceContext->PSSetSamplers(0, 1, &samplerState); //BindSamplerState
 
     // 그리기.
     RenderBuffers(deviceContext);
@@ -89,6 +135,14 @@ void Engine::DrawScene()
 
 bool Engine::InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer)
 {
+    gTransform = {
+        DirectX::XMMatrixIdentity(),
+        //DirectX::XMMatrixMultiply(DirectX::XMMatrixMultiply(DirectX::XMMatrixScaling(1.f, 1.f,1.f), DirectX::XMMatrixRotationRollPitchYaw(0.f,0.f, 0.f)), DirectX::XMMatrixTranslation(3.0f, 0.f, 10.f)),
+        DirectX::XMMatrixLookAtLH(DirectX::XMVectorSet(0.f,1.f,-5.f,0.f), DirectX::XMVectorSet(0.f,1.f,0.f,0.f), DirectX::XMVectorSet(0.f,1.f,0.f,0.f)),
+        DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PI / 2.0f,width / float(height),0.01f,1000.0f)
+    };
+    //DirectX::XMMatrixIdentity() : 초기값 
+
     // VertexShader 컴파일
     HRESULT result = D3DCompileFromFile(
         L"BasicVS.hlsl",
@@ -138,48 +192,94 @@ bool Engine::InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer)
     );
     if (FAILED(result)) { MessageBox(nullptr, L"픽셀 쉐이더 생성 실패", L"오류", 0); }
 
-    //TexturePixelShader 컴파일 
-    //TexturePixelShader 생성 
+    ////Texture 매핑
+    ////TextureVertexShader 컴파일 
+    //HRESULT tresult = D3DCompileFromFile(
+    //    L"TextureMappingVS.hlsl",
+    //    NULL,
+    //    NULL,
+    //    "main", // wchar(와일드 캐릭터) 아니라서 L 안 붙여도 됨.
+    //    "vs_5_0",
+    //    NULL,
+    //    NULL,
+    //    &TVertexShaderBuffer, // 컴파일 된 이진코드를 받아올 버퍼.
+    //    NULL
+    //);
+    //if (FAILED(tresult)) { MessageBox(nullptr, L"정점 쉐이더 컴파일 실패", L"오류", 0); }
 
-    //pixel shader 샘플러 스테이트 생성 
-    D3D11_SAMPLER_DESC samplerDesc;
-    ZeroMemory(&samplerDesc, sizeof(samplerDesc));
-    samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-    samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-    samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-    samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-    samplerDesc.MinLOD = 0;
-    samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+    ////TexturePixelShader 컴파일 
+    //tresult = D3DCompileFromFile(
+    //    L"TextureMappingPS.hlsl",
+    //    NULL,
+    //    NULL,
+    //    "main",
+    //    "ps_5_0",
+    //    NULL,
+    //    NULL,
+    //    &TPixelShaderBuffer,
+    //    NULL
+    //);
+    //if (FAILED(tresult)) { MessageBox(nullptr, L"픽셀 쉐이더 컴파일 실패", L"오류", 0); }
 
-    // 샘플러 스테이트 생성.
-    result = device->CreateSamplerState(&samplerDesc, &samplerState);
-    if (FAILED(result))
-    {
-        MessageBox(nullptr, L"샘플러 스테이트 생성 실패", L"오류", 0);
-        return false;
-    }
+    ////Load Texture
+    //Texture texture;
+    //texture.filename = L"../res/textures/dog.jpg";
+
+    //if (FAILED(result))
+    //{
+    //    return false;
+    //}
+    //textures.push_back(texture);
+
+    ////TextureVertexShader 생성 
+    //tresult = device->CreateVertexShader(
+    //vertexShaderBuffer->GetBufferPointer(), // 시작 지점 주소.
+    //    vertexShaderBuffer->GetBufferSize(), // 얼마만큼 읽을 지.
+    //    nullptr,
+    //    & TVertexShader
+    //    );
+    //    if (FAILED(tresult)) { MessageBox(nullptr, L"정점 쉐이더 생성 실패", L"오류", 0); }
+
+    //
+
+    //    //TexturePixelShader 생성 
+    // tresult = device->CreatePixelShader(
+    //        pixelShaderBuffer->GetBufferPointer(),
+    //        pixelShaderBuffer->GetBufferSize(),
+    //        nullptr,
+    //        &TPixelShader
+    //    );
+    // if (FAILED(tresult)) { MessageBox(nullptr, L"픽셀 쉐이더 생성 실패", L"오류", 0); }
+    //
+
+    ////pixel shader 샘플러 스테이트 생성 
+    //D3D11_SAMPLER_DESC samplerDesc;
+    //ZeroMemory(&samplerDesc, sizeof(samplerDesc));
+    //samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    //samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+    //samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+    //samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+    //samplerDesc.MinLOD = 0;
+    //samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+    //// 샘플러 스테이트 생성.
+    //tresult = device->CreateSamplerState(&samplerDesc, &samplerState);
+    //if (FAILED(tresult))
+    //{
+    //    MessageBox(nullptr, L"샘플러 스테이트 생성 실패", L"오류", 0);
+    //    return false;
+    //}
 
 
-    //Load Texture
-    Texture texture;
-    texture.filename = L"../res/textures/dog.png";
-
-    if (FAILED(result))
-    {
-        return false;
-    }
-    textures.push_back(texture);
-
-
-    //Texture Binding 
-    for (int ix = 0; ix < textures.size(); ++ix)
-    {
-        deviceContext->PSSetShaderResources(
-            ix,
-            1,
-            textures[ix].textureResource.GetAddressOf()
-        );
-    }
+    ////Texture Binding 
+    //for (int ix = 0; ix < textures.size(); ++ix)
+    //{
+    //    deviceContext->PSSetShaderResources(
+    //        ix,
+    //        1,
+    //        textures[ix].textureResource.GetAddressOf()
+    //    );
+    //}
 
 
     //여기서부터 Buffer
@@ -221,6 +321,33 @@ bool Engine::InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer)
     if (FAILED(result))
     {
         MessageBox(nullptr, L"정점 버퍼 생성 실패", L"오류", 0);
+        return false;
+    }
+
+    //입력 레이아웃 
+    // 정점에 대한 명세 만들기 (입력 레이아웃).
+    D3D11_INPUT_ELEMENT_DESC layout[] =
+    {
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
+    };
+
+    // 입력 레이아웃 설정.
+    result = device->CreateInputLayout(
+        layout,
+        ARRAYSIZE(layout),
+        vertexShaderBuffer->GetBufferPointer(),
+        vertexShaderBuffer->GetBufferSize(),
+        &inputLayout
+    );
+    if (FAILED(result))
+    {
+        MessageBox(nullptr, L"입력 레이아웃 생성 실패", L"오류", 0);
+        return false;
+    }
+
+    // 상수 버퍼.
+    if (FAILED(result))
+    {
         return false;
     }
 
@@ -268,6 +395,35 @@ bool Engine::InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer)
         return false;
     }
 
+    //입력 레이아웃 
+    // 정점에 대한 명세 만들기 (입력 레이아웃).
+    D3D11_INPUT_ELEMENT_DESC layout2[] =
+    {
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
+       
+    };
+
+    // 입력 레이아웃 설정.
+    result2 = device->CreateInputLayout(
+        layout2,
+        ARRAYSIZE(layout2),
+        vertexShaderBuffer->GetBufferPointer(),
+        vertexShaderBuffer->GetBufferSize(),
+        &inputLayout2
+    );
+    if (FAILED(result2))
+    {
+        MessageBox(nullptr, L"입력 레이아웃 생성 실패", L"오류", 0);
+        return false;
+    }
+
+    // 상수 버퍼.
+    if (FAILED(result2))
+    {
+        return false;
+    }
+
+
     //3. QuadUV 만들기 
     // 정점 데이터 만들기.
     // 정점(Vertex) 배열.
@@ -314,63 +470,128 @@ bool Engine::InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer)
     }
     
 
-    // 정점 데이터 설정하기.
-
     // 정점에 대한 명세 만들기 (입력 레이아웃).
-    //LPCSTR SemanticName;
-    //UINT SemanticIndex;
-    //DXGI_FORMAT Format;
-    //UINT InputSlot;
-    //UINT AlignedByteOffset;
-    //D3D11_INPUT_CLASSIFICATION InputSlotClass;
-    //UINT InstanceDataStepRate;
-    D3D11_INPUT_ELEMENT_DESC layout[] =
+
+    D3D11_INPUT_ELEMENT_DESC layout3[] =
     {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0} // 앞에 position이 float 4개라서 12바이트니까 12.
         
     };
 
-    //QuadUV
-    D3D11_INPUT_ELEMENT_DESC layout2[] =
+    // 입력 레이아웃 설정.
+    result3 = device->CreateInputLayout(
+        layout3,
+        ARRAYSIZE(layout3),
+        vertexShaderBuffer->GetBufferPointer(),
+        vertexShaderBuffer->GetBufferSize(),
+        &inputLayout3
+    );
+    if (FAILED(result3)) { MessageBox(nullptr, L"입력 레이아웃 생성 실패", L"오류", 0); }
+
+
+
+    //4.ModelUV
+    std::vector<VertexUV> vertices4;
+    // 리소스 경로 추가.
+    ResourceLoader::LoadModel(filename, &vertices4);
+
+    // 정점의 개수.
+    vertexCount4 = sizeof(vertices4);
+
+    // 정점 버퍼 만들기.
+    D3D11_BUFFER_DESC vertexBufferDesc4;
+    ZeroMemory(&vertexBufferDesc4, sizeof(vertexBufferDesc4));
+    vertexBufferDesc4.ByteWidth = sizeof(VertexUV) * vertexCount4; // 얼마만큼 읽을까.
+    vertexBufferDesc4.BindFlags = D3D11_BIND_VERTEX_BUFFER; // 정점 데이터 버퍼로 쓸 것이다.
+    vertexBufferDesc4.CPUAccessFlags = 0; // 성능을 올리기 위해 CPU가 GPU 접근할 수 있게 할까? 우리가 구분 잘해서 코딩할 수 있으면 접근하게 만들어도 됨. 0은 못 접근하게.
+    vertexBufferDesc4.MiscFlags = 0;
+    vertexBufferDesc4.Usage = D3D11_USAGE_DEFAULT;
+
+    // 데이터 담기.
+    D3D11_SUBRESOURCE_DATA vertexBufferData4;
+    ZeroMemory(&vertexBufferData4, sizeof(vertexBufferData4));
+    //vertexBufferData.pSysMem = &vertices;  // 같음.
+    vertexBufferData4.pSysMem = &vertices4;
+
+    // 정점 버퍼 생성.
+    HRESULT result4 = device->CreateBuffer(
+        &vertexBufferDesc4,
+        &vertexBufferData4,
+        &vertexBuffer4
+    );
+    if (FAILED(result4))
+    {
+        MessageBox(nullptr, L"정점 버퍼 생성 실패", L"오류", 0);
+        return false;
+    }
+
+    //입력 레이아웃 
+    // 정점에 대한 명세 만들기 (입력 레이아웃).
+    D3D11_INPUT_ELEMENT_DESC layout4[] =
     {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0} // 앞에 position이 float 4개라서 12바이트니까 12.
     };
 
     // 입력 레이아웃 설정.
-    result = device->CreateInputLayout(
-        layout,
-        ARRAYSIZE(layout),
+    result4 = device->CreateInputLayout(
+        layout4,
+        ARRAYSIZE(layout4),
         vertexShaderBuffer->GetBufferPointer(),
         vertexShaderBuffer->GetBufferSize(),
-        &inputLayout
+        &inputLayout4
     );
-    if (FAILED(result)) { MessageBox(nullptr, L"입력 레이아웃 생성 실패", L"오류", 0); }
+    if (FAILED(result4))
+    {
+        MessageBox(nullptr, L"입력 레이아웃 생성 실패", L"오류", 0);
+        return false;
+    }
 
-    // //QuadUV. 입력 레이아웃 설정.
-    result2 = device->CreateInputLayout(
-        layout2,
-        ARRAYSIZE(layout2),
-        vertexShaderBuffer->GetBufferPointer(),
-        vertexShaderBuffer->GetBufferSize(),
-        &inputLayout3
-    );
-    if (FAILED(result2)) { MessageBox(nullptr, L"입력 레이아웃 생성 실패", L"오류", 0); }
-
-
+    // 상수 버퍼.
+    if (FAILED(result4))
+    {
+        return false;
+    }
 
 
     // 상수 버퍼(transform buffer) 만들기.
+    //D3D11_BUFFER_DESC transformBufferDesc;
+    //ZeroMemory(&transformBufferDesc, sizeof(transformBufferDesc));
+    //transformBufferDesc.ByteWidth = sizeof(Matrix4f);
+    //transformBufferDesc.CPUAccessFlags = 0;
+    //transformBufferDesc.MiscFlags = 0;
+    //transformBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    //transformBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+
+    //// 단위 행렬.
+    //transformMatrix = Matrix4f::Identity();
+
+    //// 데이터 담기.
+    //D3D11_SUBRESOURCE_DATA transformBufferData;
+    //ZeroMemory(&transformBufferData, sizeof(transformBufferData));
+    //transformBufferData.pSysMem = &transformMatrix;
+
+    //// 버퍼 생성.
+    //result = device->CreateBuffer(
+    //    &transformBufferDesc,
+    //    &transformBufferData,
+    //    &constantBuffer
+    //);
+
+     // 상수 버퍼.(다른버전)
     D3D11_BUFFER_DESC transformBufferDesc;
     ZeroMemory(&transformBufferDesc, sizeof(transformBufferDesc));
-    transformBufferDesc.ByteWidth = sizeof(Matrix4f);
+    transformBufferDesc.ByteWidth = sizeof(ConstantBuffer);
     transformBufferDesc.CPUAccessFlags = 0;
     transformBufferDesc.MiscFlags = 0;
     transformBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     transformBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
     // 단위 행렬.
-    transformMatrix = Matrix4f::Identity();
+    transformMatrix.mWorld = XMMatrixTranspose(gTransform.mWorld);
+    transformMatrix.mView = XMMatrixTranspose(gTransform.mView);
+    transformMatrix.mProjection = XMMatrixTranspose(gTransform.mProjection);
 
     // 데이터 담기.
     D3D11_SUBRESOURCE_DATA transformBufferData;
@@ -381,8 +602,15 @@ bool Engine::InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer)
     result = device->CreateBuffer(
         &transformBufferDesc,
         &transformBufferData,
-        &constantBuffer
+        &cBuffer
     );
+
+    if (FAILED(result))
+    {
+        MessageBox(nullptr, L"상수 버퍼 생성 실패", L"오류", 0);
+        return false;
+    }
+
     if (FAILED(result))
     {
         MessageBox(nullptr, L"상수 버퍼 생성 실패", L"오류", 0);
@@ -403,6 +631,16 @@ bool Engine::InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer)
         return false;
     }
 
+    // 상수 버퍼3.
+    if (FAILED(result4))
+    {
+        MessageBox(nullptr, L"상수 버퍼 생성 실패", L"오류", 0);
+        return false;
+    }
+
+
+
+
     return true; //마지막
 
 }
@@ -420,55 +658,76 @@ void Engine::RenderBuffers(ID3D11DeviceContext* deviceContext)
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     //Transform Buffer(좌표 설정)
-    transformMatrix = Matrix4f::Scale(Vector3f(0.5f, 0.5f, 0.5f)) * Matrix4f::Rotation(Vector3f()) * Matrix4f::Translation(Vector3f(0.5f, 0.0f,0.5f));
+    //transformMatrix = Matrix4f::Scale(Vector3f(0.5f, 0.5f, 0.5f)) * Matrix4f::Rotation(Vector3f()) * Matrix4f::Translation(Vector3f(0.5f, 0.0f,0.5f));
     
     // 행렬 데이터가 담긴 버퍼 바인딩. (설정.)
-    deviceContext->VSSetConstantBuffers(0, 1, &constantBuffer);
+    deviceContext->VSSetConstantBuffers(0, 1, &cBuffer);
     // 행렬 데이터 업데이트.
-    deviceContext->UpdateSubresource(constantBuffer, 0, NULL, &transformMatrix, 0, 0);
+    deviceContext->UpdateSubresource(cBuffer, 0, NULL, &transformMatrix, 0, 0);
 
     // Draw (DrawBuffer)
     deviceContext->Draw(vertexCount, 0); // 이게 DrawCall이다.
 
-    
-    //Quad 그리기 
-    // 두 번째 정점 버퍼 설정과 입력 레이아웃 바인딩
-    deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer2, &stride, &offset);
-    deviceContext->IASetInputLayout(inputLayout2);
-    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    //
+    ////Quad 그리기 
+    //// 두 번째 정점 버퍼 설정과 입력 레이아웃 바인딩
+    //deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer2, &stride, &offset);
+    //deviceContext->IASetInputLayout(inputLayout2);
+    //deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    transformMatrix = Matrix4f::Scale(Vector3f(0.5f, 0.5f, 0.5f)) * Matrix4f::Rotation(Vector3f()) * Matrix4f::Translation(Vector3f(-0.25f, 0.0f, -0.25f));
+    //transformMatrix = Matrix4f::Scale(Vector3f(0.5f, 0.5f, 0.5f)) * Matrix4f::Rotation(Vector3f()) * Matrix4f::Translation(Vector3f(-0.25f, 0.0f, -0.25f));
 
-    // 상수 버퍼 설정 (두 번째 정점 버퍼에 대한 상수 버퍼)
-    deviceContext->VSSetConstantBuffers(0, 1, &constantBuffer);
+    //// 상수 버퍼 설정 (두 번째 정점 버퍼에 대한 상수 버퍼)
+    //deviceContext->VSSetConstantBuffers(0, 1, &constantBuffer);
 
-    // 상수 버퍼 업데이트
-    deviceContext->UpdateSubresource(constantBuffer, 0, NULL, &transformMatrix, 0, 0);
+    //// 상수 버퍼 업데이트
+    //deviceContext->UpdateSubresource(constantBuffer, 0, NULL, &transformMatrix, 0, 0);
 
-    // 그리기
-    deviceContext->Draw(vertexCount2, 0);
-    
+    //// 그리기
+    ////deviceContext->Draw(vertexCount2, 0);
+    //
 
-    //3. QuadUV 그리기 
-    unsigned int stride2 = sizeof(VertexUV); // 한번에 몇 개씩 읽을 지.
-    //unsigned int offset = 0;
+    ////3. QuadUV 그리기 
+    //unsigned int stride2 = sizeof(VertexUV); // 한번에 몇 개씩 읽을 지.
+    //unsigned int offset2 = 0;
 
-    deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer3, &stride2, &offset);
-    deviceContext->IASetInputLayout(inputLayout3);
+    //deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer3, &stride2, &offset2);
+    //deviceContext->IASetInputLayout(inputLayout3);
+    //deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // 선을 그릴 때는 LineList.
+
+    //transformMatrix = Matrix4f::Scale(Vector3f(0.5f, 0.5f, 0.5f)) * Matrix4f::Rotation(Vector3f()) * Matrix4f::Translation(Vector3f(0.7f, 0.0f, 0.7f));
+
+
+    // // 상수 버퍼 설정 (세 번째 정점 버퍼에 대한 상수 버퍼)
+    //deviceContext->VSSetConstantBuffers(0, 1, &constantBuffer);
+
+    //// 상수 버퍼 업데이트
+    //deviceContext->UpdateSubresource(constantBuffer, 0, NULL, &transformMatrix, 0, 0);
+
+    //// 그리기
+    //deviceContext->Draw(vertexCount3, 0);
+
+
+    //4.modelUV 그리기 (보류)
+    // Bind
+    unsigned int stride4 = sizeof(VertexUV); // 한번에 몇 개씩 읽을 지.
+    unsigned int offset4 = 0;
+
+    deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer4, &stride4, &offset4);
+    deviceContext->IASetInputLayout(inputLayout4);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // 선을 그릴 때는 LineList.
 
-    transformMatrix = Matrix4f::Scale(Vector3f(0.5f, 0.5f, 0.5f)) * Matrix4f::Rotation(Vector3f()) * Matrix4f::Translation(Vector3f(0.7f, 0.0f, 0.7f));
+    //transformMatrix = Matrix4f::Scale(Vector3f(0.5f, 0.5f, 0.5f)) * Matrix4f::Rotation(Vector3f()) * Matrix4f::Translation(Vector3f(0.3f, 0.3f, 0.3f));
 
+    // 행렬 데이터 업데이트.
+    deviceContext->UpdateSubresource(cBuffer, 0, NULL, &transformMatrix, 0, 0);
 
-     // 상수 버퍼 설정 (세 번째 정점 버퍼에 대한 상수 버퍼)
-    deviceContext->VSSetConstantBuffers(0, 1, &constantBuffer);
+    // 행렬 데이터가 담긴 버퍼 바인딩. (설정.)
+    deviceContext->VSSetConstantBuffers(0, 1, &cBuffer);
+    
+    //그리기
+    deviceContext->Draw(vertexCount4, 0);
 
-    // 상수 버퍼 업데이트
-    deviceContext->UpdateSubresource(constantBuffer, 0, NULL, &transformMatrix, 0, 0);
-
-
-    // 그리기
-    deviceContext->Draw(vertexCount3, 0);
     
 }
 
