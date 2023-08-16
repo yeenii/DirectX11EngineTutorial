@@ -41,8 +41,14 @@ public:
 	void SetScale(float x, float y, float z);
 	void SetScale(Vector3f scale);
 
+	//인덱스 버퍼 카운트 
+	int Count() { return count; }
+	void* data;
+
 	//ResourceModel
 	//static void LoadModel(std::string filename, std::vector<VertexUV>* vertices4);
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
 
 protected:
 	void Update() override;
@@ -94,6 +100,8 @@ private:
 	//ID3D11Buffer* constantBuffer; //상수버퍼
 	ID3D11Buffer* cBuffer;
 	
+	//인덱스 버퍼 
+	ID3D11Buffer* buffer;
 
 	// 트랜스폼 데이터.
 	Vector3f position;
@@ -102,6 +110,9 @@ private:
 
 	float width;
 	float height;
+
+	//인덱스버퍼 카운트
+	int count;
 
 
 };

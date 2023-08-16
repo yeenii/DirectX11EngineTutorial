@@ -29,7 +29,7 @@ public:
 	);
 	// ¸ðµ¨ ·Îµù.
 	static void LoadModel(std::string filename, std::vector<Vertex>* vertices);
-	static void LoadModel(std::string filename, std::vector<VertexUV>* vertice4);
+	static void LoadModel(std::string filename, std::vector<Vertex>* vertices, std::vector<unsigned int>* indices);
 
 	static std::wstring GetExtension(std::wstring str);
 

@@ -119,7 +119,7 @@ void ResourceLoader::LoadModel(std::string filename, std::vector<Vertex>* vertic
 	}
 }
 
-void ResourceLoader::LoadModel(std::string filename, std::vector<VertexUV>* vertices4)
+void ResourceLoader::LoadModel(std::string filename, std::vector<Vertex>* vertices, std::vector<unsigned int>* indices)
 {
 	// 리소스 경로 추가.
 	filename = std::string("..//res//models//") + filename;
@@ -147,12 +147,19 @@ void ResourceLoader::LoadModel(std::string filename, std::vector<VertexUV>* vert
 	if (scene != nullptr)
 	{
 		const aiMesh* mesh = scene->mMeshes[0]; // 원래는 여러 개 있을 수도 있어서, 루프 돌아야 함.
-		vertices4->reserve(mesh->mNumVertices);
+		vertices->reserve(mesh->mNumVertices);
+		indices->reserve((size_t)(mesh->mNumFaces) * 3);
 
 		// 정점 배열 채우기.
 		for (int ix = 0; ix < mesh->mNumVertices; ix++)
 		{
-			// 위치 읽어오기.
+			Vertex position = Vertex(
+				mesh->mVertices[ix].x,
+				mesh->mVertices[ix].y,
+				mesh->mVertices[ix].z
+			);
+			/*
+			//// 위치 읽어오기.
 			Vector3f position = Vector3f(
 				mesh->mVertices[ix].x,
 				mesh->mVertices[ix].y,
@@ -174,8 +181,18 @@ void ResourceLoader::LoadModel(std::string filename, std::vector<VertexUV>* vert
 			}
 
 			VertexUV vertex = VertexUV(position, uv);
-			vertices4->push_back(vertex);
+			vertices->push_back(vertex);*/
+			vertices->push_back(position);
 		}
+
+		for (unsigned int ix = 0; ix < mesh->mNumFaces; ix++)
+		{
+			const aiFace& face = mesh->mFaces[ix];
+			indices->push_back(face.mIndices[0]);
+			indices->push_back(face.mIndices[1]);
+			indices->push_back(face.mIndices[2]);
+		}
+		
 	}
 	else
 	{
