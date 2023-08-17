@@ -78,7 +78,7 @@ void Engine::Update()
 {
     //업데이트할 때 마다 변경할 것 넣어주기 
     static float t = 0;
-    //t += 0.2;
+    t += 0.02;
     //transformMatrix = Matrix4f::Scale(scale) * Matrix4f::Rotation(rotation) * Matrix4f::Translation(position);
     transformMatrix.mWorld = DirectX::XMMatrixTranspose(DirectX::XMMatrixMultiply(DirectX::XMMatrixMultiply(DirectX::XMMatrixScaling(1.f, 1.f, 1.f), DirectX::XMMatrixRotationRollPitchYaw(0.f, 0.f, 0.f)), DirectX::XMMatrixTranslation(t, t, t)));
     
@@ -739,7 +739,7 @@ void Engine::RenderBuffers(ID3D11DeviceContext* deviceContext)
 
     //4.modelUV 그리기 (보류)
     // Bind
-    unsigned int stride = sizeof(VertexUV); // 한번에 몇 개씩 읽을 지.
+    unsigned int stride = sizeof(Vertex); // 한번에 몇 개씩 읽을 지.
     unsigned int offset = 0;
 
     deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
