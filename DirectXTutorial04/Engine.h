@@ -57,7 +57,7 @@ protected:
 	
 private:
 	// 장면 초기화.
-	bool InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer); //shader,Buffer의 compile, create, bind 있음 
+	bool InitializeScene(); //shader,Buffer의 compile, create, bind 있음 
 	void RenderBuffers(ID3D11DeviceContext* deviceContext);//BindBuffer, DrawBuffer,UpdateBuffer
 	
 	// 변수.

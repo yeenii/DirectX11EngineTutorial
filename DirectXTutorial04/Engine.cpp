@@ -30,7 +30,7 @@ bool Engine::Initialize()
     }
 
     // 장면 초기화.
-    if (InitializeScene(device, vertexShaderBuffer) == false)
+    if (InitializeScene() == false)
     {
         return false;
     }
@@ -135,7 +135,7 @@ void Engine::DrawScene()
 }
 
 
-bool Engine::InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer)
+bool Engine::InitializeScene()
 {
     gTransform = {
         DirectX::XMMatrixIdentity(),
@@ -587,8 +587,8 @@ bool Engine::InitializeScene(ID3D11Device* device, ID3DBlob* vertexShaderBuffer)
     transformBufferDesc.ByteWidth = sizeof(ConstantBuffer);
     transformBufferDesc.CPUAccessFlags = 0;
     transformBufferDesc.MiscFlags = 0;
-    transformBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    transformBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    transformBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER; //0
+    transformBufferDesc.Usage = D3D11_USAGE_DEFAULT; //default
 
     // 단위 행렬.
     transformMatrix.mWorld = XMMatrixTranspose(gTransform.mWorld);
@@ -757,7 +757,7 @@ void Engine::RenderBuffers(ID3D11DeviceContext* deviceContext)
     
     //그리기
     //deviceContext->Draw(vertexCount, 0);
-    deviceContext->DrawIndexed(this->count, 0, 0);
+    deviceContext->DrawIndexed(this->count, 0, 0); //인덱스버퍼 카운트
 
     
 }

@@ -18,7 +18,7 @@ struct vs_input
 // 정점 출력.
 struct vs_output
 {
-    float4 position : SV_POSITION;
+    float4 position : SV_POSITION; //화면 상의 위치 
 };
 
 // float4 main(float4 position : POSITION) : SV_POSITION
@@ -31,7 +31,7 @@ vs_output main(vs_input input)
     
     //ModelUV를 실행하려면 world로 인해 잘 동작하지 않을 수 있음 
     vs_output output;
-    output.position = mul(input.position, world);
+    output.position = mul(input.position, world); //vector, MVP matrix
     output.position = mul(output.position, view);
     output.position = mul(output.position, projection);
 
